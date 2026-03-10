@@ -2,7 +2,6 @@ const questionService = require('../services/question.service');
 const logger = require('../utils/logger');
 
 const formatQuestionsResponse = (questions) => questions.map((q) => q.toJSON());
-
 module.exports = {
   async listQuestions(req, res, next) {
     try {

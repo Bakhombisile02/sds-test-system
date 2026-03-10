@@ -2,6 +2,13 @@ const winston = require('winston');
 const DailyRotateFile = require('winston-daily-rotate-file');
 const { AuditLog } = require('../models');
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const normalizeUserId = (value) => {
+  if (typeof value !== 'string') return null;
+  return UUID_REGEX.test(value) ? value : null;
+};
+
 // Custom transport for saving audit logs to database
 class DatabaseTransport extends winston.Transport {
   constructor(opts) {
@@ -16,7 +23,7 @@ class DatabaseTransport extends winston.Transport {
       const allowed = ['LOGIN', 'REGISTER', 'LOGOUT', 'TEST_START', 'TEST_COMPLETE', 'PROFILE_UPDATE', 'PASSWORD_CHANGE', 'ACCESS_DENIED', 'SYSTEM'];
       if (info.actionType && allowed.includes(info.actionType)) {
         await AuditLog.create({
-          userId: info.userId || null,
+          userId: normalizeUserId(info.userId),
           actionType: info.actionType,
           description: info.message,
           details: info.details || {},
@@ -35,7 +42,7 @@ class DatabaseTransport extends winston.Transport {
 // Format to extract request metadata
 const requestMetadata = winston.format((info) => {
   if (info.req) {
-    info.userId = info.req.user?.id || null;
+    info.userId = normalizeUserId(info.req.user?.id);
     info.ipAddress = info.req.ip || info.req.headers['x-forwarded-for'] || null;
     info.userAgent = info.req.headers['user-agent'] || null;
   }
