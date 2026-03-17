@@ -20,7 +20,7 @@ services:
     name: sds-test-api-staging
     runtime: node
     rootDir: backend
-    buildCommand: npm install && npx sequelize-cli db:migrate
+    buildCommand: npm install && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all
     startCommand: node server.js
     healthCheckPath: /health
     envVars:
