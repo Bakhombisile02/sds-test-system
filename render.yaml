@@ -19,7 +19,6 @@ services:
   - type: web
     name: sds-test-api-staging
     runtime: node
-    plan: free
     rootDir: backend
     buildCommand: npm install && npx sequelize-cli db:migrate
     startCommand: node server.js
@@ -63,7 +62,6 @@ services:
   - type: web
     name: sds-test-staging
     runtime: static
-    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: build
