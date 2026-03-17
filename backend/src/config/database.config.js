@@ -1,6 +1,7 @@
 const { Sequelize } = require('sequelize');
 const config = require('./config');
 
+const isProduction = process.env.NODE_ENV === 'production';
 const isTest = process.env.NODE_ENV === 'test';
 let connectionUrl = null;
 if (isTest && process.env.TEST_DATABASE_URL) {
@@ -12,10 +13,15 @@ if (isTest && process.env.TEST_DATABASE_URL) {
   connectionUrl = /\/[^/]+\/?$/.test(url) ? url.replace(/\/?$/, '') : `${url.replace(/\/?$/, '')}/${dbName}`;
 }
 
+const sslOptions = isProduction
+  ? { ssl: { require: true, rejectUnauthorized: false } }
+  : {};
+
 const sequelize = connectionUrl
   ? new Sequelize(connectionUrl, {
       dialect: 'postgres',
       logging: process.env.NODE_ENV === 'development' ? console.log : false,
+      dialectOptions: sslOptions,
       pool: {
         max: 5,
         min: 0,

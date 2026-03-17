@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.13.0] - 2026-03-17
+
+### Added — Render.com Staging Deployment Configuration
+
+Render Blueprint (Infrastructure as Code) and production-readiness fixes for one-click staging deployment.
+
+#### New Files
+- **`render.yaml`** — Render Blueprint that auto-provisions all three services:
+  - **Static Site** (`sds-test-staging`) — React SPA with `/*` → `/index.html` rewrite rule
+  - **Web Service** (`sds-test-api-staging`) — Express.js API with health check at `/health`
+  - **PostgreSQL** (`sds-test-db-staging`) — Managed database (free tier, 256 MB)
+  - Auto-wires `DATABASE_URL`, `FRONTEND_URL`, and `REACT_APP_API_URL` between services
+  - JWT secrets auto-generated via `generateValue: true`
+- **`backend/.env.example`** — Template for all backend environment variables
+- **`frontend/.env.example`** — Template for frontend environment variables
+
+#### Modified Files
+- **`backend/src/config/database.config.js`** — Added SSL `dialectOptions` (`require: true, rejectUnauthorized: false`) when `NODE_ENV=production`, required for Render managed PostgreSQL
+- **`backend/package.json`**:
+  - Added `sequelize-cli` as devDependency (required for migration build step)
+  - Added `build` script: `npx sequelize-cli db:migrate` (runs on each Render deploy)
+  - Added `seed` script: `npx sequelize-cli db:seed:all` (run manually after first deploy)
+
+#### Deployment Steps
+1. Push to GitHub
+2. On Render → New → Blueprint Instance → select repo → Render provisions all services
+3. After first deploy, open Render Shell on backend service and run: `npm run seed`
+4. Visit frontend URL to verify
+
+#### Architecture
+```
+[Render Static Site] → React build (frontend)
+         ↓ API calls
+[Render Web Service] → Express.js (backend, port 5000)
+         ↓ queries
+[Render PostgreSQL]  → sds_test_db (managed database)
+```
+
+---
+
 ## [2.12.2] - 2026-03-13
 
 ### Changed — Regional Map GeoJSON Integration
