@@ -43,10 +43,7 @@ services:
       - key: JWT_REFRESH_EXPIRE
         value: 7d
       - key: FRONTEND_URL
-        fromService:
-          name: sds-test-staging
-          type: web
-          property: host
+        sync: false  # Set to https://<frontend-url>.onrender.com after first deploy
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT
@@ -71,7 +68,4 @@ services:
         destination: /index.html
     envVars:
       - key: REACT_APP_API_URL
-        fromService:
-          name: sds-test-api-staging
-          type: web
-          property: host
+        sync: false  # Set to https://<backend-url>.onrender.com after first deploy
