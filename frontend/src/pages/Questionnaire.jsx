@@ -320,7 +320,6 @@ const Questionnaire = () => {
 
     return () => clearInterval(interval);
   }, [isPaused, assessment?.id, persistElapsedTime]);
-  }, [isPaused, assessment?.id, persistElapsedTime]);
 
   useEffect(() => {
     return () => {
