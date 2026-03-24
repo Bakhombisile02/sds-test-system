@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { PermissionProvider } from './context/PermissionContext';
+import { AccessibilityProvider } from './context/AccessibilityContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -16,6 +17,7 @@ import TestCompletion from './pages/TestCompletion';
 import TestResults from './pages/TestResults';
 import TestTakerDashboard from './pages/TestTakerDashboard';
 import Profile from './pages/Profile';
+import AccessibilityPage from './pages/AccessibilityPage';
 import ChangePassword from './pages/ChangePassword';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
@@ -28,6 +30,7 @@ import AdminAuditPage from './pages/admin/AdminAuditPage';
 import AdminSubjectsPage from './pages/admin/AdminSubjectsPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 import AdminCoursesPage from './pages/admin/AdminCoursesPage';
+import AdminUserDetailPage from './pages/admin/AdminUserDetailPage';
 import AdminEducationLevelsPage from './pages/admin/AdminEducationLevelsPage';
 import AdminCertificatesPage from './pages/admin/AdminCertificatesPage';
 import Notifications from './pages/Notifications';
@@ -37,6 +40,8 @@ import EditUserPermissions from './pages/EditUserPermissions';
 import Unauthorized from './pages/Unauthorized';
 import NotFound from './pages/NotFound';
 import Onboarding from './pages/Onboarding';
+import Help from './pages/Help';
+import GlossaryPage from './pages/GlossaryPage';
 import './index.css';
 
 function App() {
@@ -44,9 +49,11 @@ function App() {
     <Router>
       <AuthProvider>
       <PermissionProvider>
+      <AccessibilityProvider>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
+          <Route path="/help" element={<Help />} />
           <Route path="/register" element={<Register />} />
           <Route path="/registration-success" element={<RegistrationSuccess />} />
           <Route path="/login" element={<Login />} />
@@ -81,7 +88,7 @@ function App() {
           } />
           <Route path="/test" element={
             <ProtectedRoute allowedRoles={['Test Taker']}>
-              <Questionnaire />
+              <QuestionnaireIntro />
             </ProtectedRoute>
           } />
           <Route path="/test-complete" element={
@@ -99,6 +106,16 @@ function App() {
               <Profile />
             </ProtectedRoute>
           } />
+          <Route path="/glossary" element={
+            <ProtectedRoute allowedRoles={['Test Taker', 'System Administrator', 'Test Administrator']}>
+              <GlossaryPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/accessibility" element={
+            <ProtectedRoute allowedRoles={['Test Taker', 'System Administrator', 'Test Administrator']}>
+              <AccessibilityPage />
+            </ProtectedRoute>
+          } />
 
           {/* Admin & Test Administrator Routes — permissions control actual access */}
           <Route path="/admin" element={
@@ -114,6 +131,11 @@ function App() {
           <Route path="/admin/users" element={
             <ProtectedRoute allowedRoles={['System Administrator', 'Test Administrator']}>
               <AdminUsersPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/users/:userId" element={
+            <ProtectedRoute allowedRoles={['System Administrator', 'Test Administrator']}>
+              <AdminUserDetailPage />
             </ProtectedRoute>
           } />
           <Route path="/admin/users/:userId/permissions" element={
@@ -197,6 +219,7 @@ function App() {
           {/* Catch-all Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+      </AccessibilityProvider>
       </PermissionProvider>
       </AuthProvider>
     </Router>

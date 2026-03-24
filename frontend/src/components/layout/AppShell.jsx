@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   User, LogOut, ChevronDown, ChevronRight, Home,
-  BarChart2, Settings, Menu, X, Bell, Award, FileText,
+  BarChart2, Settings, Menu, X, Bell, Award, FileText, Monitor,
+  BookOpen,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePermissions } from '../../context/PermissionContext';
@@ -14,14 +15,17 @@ const ADMIN_NAV_LINKS = [
   { to: '/admin/dashboard', label: 'Dashboard', Icon: Home, permission: null },
   { to: '/admin/results', label: 'Results', Icon: Award, permission: 'results.view' },
   { to: '/admin/analytics', label: 'Analytics', Icon: BarChart2, permission: 'analytics.view' },
-  { to: '/admin/reports', label: 'Reports', Icon: FileText, permission: 'analytics.view' },
+  { to: '/admin/reports', label: 'Report', Icon: FileText, permission: 'analytics.view' },
   { to: '/admin/notifications', label: 'Notifications', Icon: Bell, badge: true, permission: 'notifications.view' },
   { to: '/admin/settings', label: 'Settings', Icon: Settings, permission: null },
+  { to: '/glossary', label: 'Glossary', Icon: BookOpen, permission: null },
 ];
 
 const TEST_TAKER_NAV = [
   { to: '/dashboard', label: 'Dashboard', Icon: Home },
   { to: '/profile', label: 'Profile', Icon: User },
+  { to: '/glossary', label: 'Glossary', Icon: BookOpen },
+  { to: '/accessibility', label: 'Accessibility', Icon: Monitor },
 ];
 
 const ROLE_LABELS = {
@@ -39,10 +43,11 @@ const ROLE_COLORS = {
 const BREADCRUMB_MAP = {
   '/admin/dashboard': [{ label: 'Admin' }],
   '/admin/users': [{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Settings', to: '/admin/settings' }, { label: 'Users' }],
+  '/admin/users/:userId': [{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Settings', to: '/admin/settings' }, { label: 'Users', to: '/admin/settings?tab=users' }, { label: 'User Details' }],
   '/admin/institutions': [{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Settings', to: '/admin/settings' }, { label: 'Institutions' }],
   '/admin/occupations': [{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Settings', to: '/admin/settings' }, { label: 'Occupations' }],
   '/admin/results': [{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Results' }],
-  '/admin/reports': [{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Reports' }],
+  '/admin/reports': [{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Report' }],
   '/admin/audit': [{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Settings', to: '/admin/settings' }, { label: 'Audit Log' }],
   '/admin/analytics': [{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Analytics' }],
   '/admin/notifications': [{ label: 'Admin', to: '/admin/dashboard' }, { label: 'Notifications' }],
@@ -54,6 +59,8 @@ const BREADCRUMB_MAP = {
   '/counselor': [{ label: 'Test Administrator' }],
   '/dashboard': [{ label: 'Dashboard' }],
   '/profile': [{ label: 'Profile' }],
+  '/glossary': [{ label: 'Glossary' }],
+  '/accessibility': [{ label: 'Accessibility' }],
   '/results': [{ label: 'Dashboard', to: '/dashboard' }, { label: 'Results' }],
 };
 
@@ -107,8 +114,6 @@ export default function AppShell({ children, breadcrumbs: customBreadcrumbs }) {
           </p>
         </div>
       </div>
-
-      <div style={{ height: 1, background: 'linear-gradient(90deg, #c8a84b 0%, #e8d48b 50%, #c8a84b 100%)' }} />
 
       {/* ── Primary nav bar ── */}
       <header
@@ -283,7 +288,7 @@ export default function AppShell({ children, breadcrumbs: customBreadcrumbs }) {
       )}
 
       {/* ── Page content ── */}
-      <main className="flex-1">
+      <main className="flex-1 overflow-auto custom-scrollbar">
         {children}
       </main>
     </div>

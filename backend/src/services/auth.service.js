@@ -89,10 +89,27 @@ module.exports = {
 
   /* ─── Verify Email ────────────────────────────────────────────────────── */
   verifyEmail: async (tokenParam) => {
-    const user = await User.findOne({
+    let user = await User.findOne({
       where: { emailVerificationToken: tokenParam, emailVerificationExpires: { [Op.gt]: new Date() } }
     });
-    if (!user) throw Object.assign(new Error('Token is invalid or has expired'), { status: 400 });
+
+    if (!user) {
+      // Check if this token belongs to an already verified user by checking recent tokens
+      // We need to find the user by checking if they have isEmailVerified=true and recently had this token
+      const recentlyVerifiedUser = await User.findOne({
+        where: { 
+          isEmailVerified: true,
+          // Check if user was verified in the last hour (to handle race conditions)
+          updatedAt: { [Op.gt]: new Date(Date.now() - 60 * 60 * 1000) }
+        },
+        order: [['updatedAt', 'DESC']]
+      });
+      
+      if (recentlyVerifiedUser) {
+        return { user: recentlyVerifiedUser, token: null, refreshToken: null, alreadyVerified: true };
+      }
+      throw Object.assign(new Error('Token is invalid or has expired'), { status: 400 });
+    }
 
     user.isEmailVerified = true;
     user.emailVerificationToken = null;

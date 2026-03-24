@@ -27,3 +27,128 @@
     @apply w-full pr-0 py-2 border-0 border-b rounded-none bg-transparent text-sm focus:outline-none focus:ring-0;
   }
 }
+
+/* Modern scrollbar styling */
+@layer utilities {
+  /* Standard properties for Firefox */
+  html,
+  body,
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+  }
+
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+
+  html::-webkit-scrollbar-track,
+  body::-webkit-scrollbar-track,
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
+
+  html::-webkit-scrollbar-thumb,
+  body::-webkit-scrollbar-thumb,
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+    transition: background 0.2s ease;
+  }
+
+  html::-webkit-scrollbar-thumb:hover,
+  body::-webkit-scrollbar-thumb:hover,
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  html::-webkit-scrollbar-thumb:active,
+  body::-webkit-scrollbar-thumb:active,
+  .custom-scrollbar::-webkit-scrollbar-thumb:active {
+    background: #64748b;
+  }
+
+  /* Horizontal scrollbar */
+  html::-webkit-scrollbar-corner,
+  body::-webkit-scrollbar-corner,
+  .custom-scrollbar::-webkit-scrollbar-corner {
+    background: #f1f5f9;
+  }
+
+  /* Accessibility Styles */
+  .font-size-small {
+    font-size: 14px;
+  }
+  
+  .font-size-normal {
+    font-size: 16px;
+  }
+  
+  .font-size-large {
+    font-size: 18px;
+  }
+  
+  .font-size-extra-large {
+    font-size: 20px;
+  }
+
+  .high-contrast {
+    filter: contrast(1.2);
+  }
+  
+  .high-contrast * {
+    border-color: #000000 !important;
+  }
+  
+  .high-contrast .btn-primary {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+  }
+  
+  .high-contrast .btn-secondary {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+  }
+
+  .screen-reader-mode .sr-only {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    clip: auto !important;
+    clip-path: none !important;
+  }
+
+  .reduced-motion * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Focus indicators for keyboard navigation */
+  *:focus-visible {
+    outline: 3px solid #1e3a5f;
+    outline-offset: 2px;
+  }
+
+  /* Skip to main content link for screen readers */
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #1e3a5f;
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    z-index: 100;
+  }
+
+  .skip-link:focus {
+    top: 6px;
+  }
+}
