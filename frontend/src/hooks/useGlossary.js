@@ -7,6 +7,24 @@ import { glossaryService } from '../services/glossaryService';
  * Now loads from database instead of static data
  */
 
+const inferDifficultyFromSection = (section = 'general') => {
+  if (section === 'riasec' || section === 'structure') return 'low';
+  if (section === 'actions' || section === 'occupations') return 'medium';
+  return 'medium';
+};
+
+const normalizeGlossaryTerm = (term) => {
+  const normalizedCategory = term.category || term.section || 'general';
+
+  return {
+    ...term,
+    category: normalizedCategory,
+    section: term.section || normalizedCategory,
+    difficulty: term.difficulty || inferDifficultyFromSection(term.section || normalizedCategory),
+    related: Array.isArray(term.related) ? term.related : []
+  };
+};
+
 export const useGlossary = () => {
   const [learnedTerms, setLearnedTerms] = useState(new Set());
   const [termInteractions, setTermInteractions] = useState({});
@@ -20,7 +38,7 @@ export const useGlossary = () => {
       try {
         setLoading(true);
         const terms = await glossaryService.listTerms();
-        setGlossaryTerms(terms);
+        setGlossaryTerms((terms || []).map(normalizeGlossaryTerm));
       } catch (error) {
         console.warn('Failed to load glossary terms from database:', error);
         // Fallback to empty array - will show no glossary terms
@@ -190,14 +208,20 @@ export const useGlossary = () => {
     // Get all terms from database
     getAllTerms: () => glossaryTerms,
     
-    // Get terms by section (alias for category)
+    // Backward-compatible category access used by glossary UI
+    getTermsByCategory: (category) => {
+      if (!category || category === 'all') return glossaryTerms;
+      return glossaryTerms.filter(term => term.category === category);
+    },
+
+    // Get terms by section
     getTermsBySection: (section) => {
       return glossaryTerms.filter(term => term.section === section);
     },
-    
-    // Get terms by category (maps to section for compatibility)
-    getTermsByCategory: (category) => {
-      return glossaryTerms.filter(term => term.section === category);
+
+    // Backward-compatible difficulty filter
+    getTermsByDifficulty: (difficulty) => {
+      return glossaryTerms.filter(term => term.difficulty === difficulty);
     },
     
     // Search terms
@@ -214,7 +238,19 @@ export const useGlossary = () => {
     
     // Find term by key
     findTerm: (key) => {
+      if (!key) return null;
       return glossaryTerms.find(t => t.term.toLowerCase() === key.toLowerCase());
+    },
+
+    // Backward-compatible related terms accessor
+    getRelatedTerms: (termKey) => {
+      const term = dbGlossaryUtils.findTerm(termKey);
+      if (!term || !Array.isArray(term.related) || term.related.length === 0) {
+        return [];
+      }
+      return term.related
+        .map(relatedKey => dbGlossaryUtils.findTerm(relatedKey))
+        .filter(Boolean);
     },
     
     // Get terms that should be highlighted (simplified - just returns all terms)

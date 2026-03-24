@@ -320,6 +320,7 @@ const Questionnaire = () => {
 
     return () => clearInterval(interval);
   }, [isPaused, assessment?.id, persistElapsedTime]);
+  }, [isPaused, assessment?.id, persistElapsedTime]);
 
   useEffect(() => {
     return () => {
@@ -335,7 +336,6 @@ const Questionnaire = () => {
     if (!assessment?.id) return;
     persistQuestionPosition(assessment.id, currentSectionIndex, currentQuestionIndex);
   }, [assessment?.id, currentSectionIndex, currentQuestionIndex, persistQuestionPosition]);
-
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;

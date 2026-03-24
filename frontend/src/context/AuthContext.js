@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
@@ -67,14 +67,14 @@ export const AuthProvider = ({ children }) => {
     }
   }, [navigate]);
 
-  const value = {
+  const value = useMemo(() => ({
     user,
     isAuthenticated,
     loading,
     login,
     logout,
     setSession
-  };
+  }), [user, isAuthenticated, loading, login, logout, setSession]);
 
   return (
     <AuthContext.Provider value={value}>
